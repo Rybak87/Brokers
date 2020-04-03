@@ -1,27 +1,22 @@
-﻿using Brokers.DAL.Model;
+﻿using Confluent.Kafka;
 using Newtonsoft.Json;
-using RabbitMQ.Client;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace Publisher.Console
+namespace Producer.Console
 {
-
-    class Publisher
+    class Producer
     {
-        private const string alphabet = "abcefghijklmnopqrstuvwxys";
         static Random rand = new Random();
-        static IModel channel;
+        private const string alphabet = " abcefghijklmnopqrstuvwxyz";
+        private IProducer producer = new ;
 
         static void Main(string[] args)
         {
-            var cf = new ConnectionFactory();
-            var conn = cf.CreateConnection();
-
-            channel = conn.CreateModel();
-            channel.QueueDeclare("messages", true, false, false, null);
-
+            producer.Initialize();
             string input = string.Empty;
 
             try
@@ -37,14 +32,14 @@ namespace Publisher.Console
                     for (int i = 0; i < count; i++)
                     {
                         var message = GetRandomMessage();
-                        SendRequest(JsonConvert.SerializeObject(message));
+                        producer.SendRequest(JsonConvert.SerializeObject(message));
                     }
                 }
             }
+            catch { }
             finally
             {
-                channel.Close();
-                conn.Close();
+                producer.Dispose();
             }
         }
 
@@ -60,12 +55,6 @@ namespace Publisher.Console
                 Content = new string(Enumerable.Repeat(0, rand.Next(1, 30)).Select(a => alphabet[rand.Next(alphabet.Length)]).ToArray()),
                 Title = new string(Enumerable.Repeat(0, rand.Next(1, 30)).Select(a => alphabet[rand.Next(alphabet.Length)]).ToArray())
             };
-        }
-
-        static void SendRequest(string message)
-        {
-            byte[] messageBodyBytes = Encoding.UTF8.GetBytes(message);
-            channel.BasicPublish("main", "", null, messageBodyBytes);
         }
     }
 }

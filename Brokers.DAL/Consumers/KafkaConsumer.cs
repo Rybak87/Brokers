@@ -20,6 +20,7 @@ namespace Brokers.DAL.Consumers
         {
             Initialize();
             this.logger = logger;
+            this.logger.InitLogger();
         }
 
         public void Close()
@@ -40,7 +41,6 @@ namespace Brokers.DAL.Consumers
                 BootstrapServers = "localhost",
                 GroupId = "abc",
                 AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnableAutoOffsetStore = false
             };
         }
         private async Task Receive(CancellationToken cancellationToken)
@@ -49,23 +49,21 @@ namespace Brokers.DAL.Consumers
             {
                 using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
                 {
+                    Message message;
                     consumer.Subscribe("main");
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         var consumeResult = consumer.Consume(cancellationToken);
                         var strMessage = consumeResult.Message.Value;
-                        Message message;
                         try
                         {
-                            message = JsonConvert.DeserializeObject<Message>(strMessage);
+                            message = JsonConvert.DeserializeObject<Message>(consumeResult.Message.Value);
+                            NewMessage?.BeginInvoke(message, null, null);
                         }
                         catch (Exception ex)
                         {
                             logger.WriteError(ex.Message);
-                            return;
                         }
-                        NewMessage?.BeginInvoke(message, null, null);
-                        consumer.Commit(consumeResult);
                     }
                     consumer.Close();
                 }

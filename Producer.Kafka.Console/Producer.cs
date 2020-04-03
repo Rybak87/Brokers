@@ -2,6 +2,7 @@
 using Confluent.Kafka;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -11,7 +12,7 @@ namespace Producer.Kafka.Console
     class Producer
     {
         static IProducer<Null, string> producer;
-
+        static Random rand = new Random();
         private const string alphabet = " abcefghijklmnopqrstuvwxyz";
 
         static void Main(string[] args)
@@ -33,14 +34,13 @@ namespace Producer.Kafka.Console
                     {
                         var message = GetRandomMessage();
                         SendRequest(JsonConvert.SerializeObject(message));
-                        Thread.Sleep(100);
                     }
                 }
             }
             catch { }
             finally
             {
-                producer.Dispose();//
+                producer.Dispose();
             }
         }
 
@@ -56,7 +56,6 @@ namespace Producer.Kafka.Console
 
         static Message GetRandomMessage()
         {
-            var rand = new Random();
             return new Message()
             {
                 AuthorId = rand.Next(1, 100),
