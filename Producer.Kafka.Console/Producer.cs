@@ -37,6 +37,7 @@ namespace Producer.Kafka.Console
                     }
                 }
             }
+            catch { }
             finally
             {
                 producer.Dispose();//

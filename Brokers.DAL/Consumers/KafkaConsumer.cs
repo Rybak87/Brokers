@@ -14,8 +14,13 @@ namespace Brokers.DAL.Consumers
         CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
         CancellationToken token;
         ConsumerConfig config;
-
         private readonly ILogger logger;
+
+        public KafkaConsumer(ILogger logger)
+        {
+            Initialize();
+            this.logger = logger;
+        }
 
         public void Close()
         {
@@ -26,11 +31,6 @@ namespace Brokers.DAL.Consumers
         {
             token = cancelTokenSource.Token;
             Receive(token);
-        }
-
-        public KafkaConsumer()
-        {
-            Initialize();
         }
 
         private void Initialize()

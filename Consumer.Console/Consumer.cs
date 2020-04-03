@@ -12,7 +12,9 @@ namespace Brokers.DAL.Console
     class Consumer
     {
         static IMessageConsumer consumer;
+        static ILogger logger = new Log4Net("loggerLog4net");
         static object locker = new object();
+
 
         static void Main(string[] args)
         {
@@ -20,13 +22,12 @@ namespace Brokers.DAL.Console
             {
                 if (args.Contains("kafka"))
                 {
-                    consumer = new KafkaConsumer();
+                    consumer = new KafkaConsumer(logger);
                 }
                 else
                 {
                     RabbitMQSettings settings = (RabbitMQSettings)ConfigurationManager.GetSection("rabbitMQSettings");
-
-                    consumer = new RabbitMQConsumer(settings, new Log4Net("loggerLog4net"));
+                    consumer = new RabbitMQConsumer(settings, logger);
                 }
             }
             catch (Exception ex)
