@@ -74,8 +74,10 @@
     <Compile Include="Consumers\RabbitMQConsumer.cs" />
     <Compile Include="Interfaces\IConsumer.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
+    <Compile Include="Interfaces\IProducer.cs" />
     <Compile Include="Loggers\Log4Net.cs" />
     <Compile Include="Model\Message.cs" />
+    <Compile Include="Producers\RabbitMQProducer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,21 +1,28 @@
-﻿using Confluent.Kafka;
+﻿using Brokers.DAL.Interfaces;
+using Brokers.DAL.Producers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Producer.Console
 {
-    class Producer
+    public class ProducerRandom<T> where T : class, new()
     {
         static Random rand = new Random();
         private const string alphabet = " abcefghijklmnopqrstuvwxyz";
-        private IProducer producer = new ;
+        static IProducer producer = new RabbitMQProducer();
+        static List<PropertyInfo> props;
 
         static void Main(string[] args)
         {
+            var props = typeof(T).GetProperties().Where(p => p.CanWrite
+                && p.PropertyType == typeof(int)
+                || p.PropertyType == typeof(string)).ToList();
+
             producer.Initialize();
             string input = string.Empty;
 
@@ -31,7 +38,7 @@ namespace Producer.Console
 
                     for (int i = 0; i < count; i++)
                     {
-                        var message = GetRandomMessage();
+                        var message = GetRandomEntity();
                         producer.SendRequest(JsonConvert.SerializeObject(message));
                     }
                 }
@@ -43,18 +50,22 @@ namespace Producer.Console
             }
         }
 
-        static Message GetRandomMessage()
+        static T GetRandomEntity()
         {
-            return new Message()
+            var ent = new T();
+            props.ForEach(p =>
             {
-                AuthorId = rand.Next(1, 100),
-                HostId = rand.Next(1, 100),
-                PublicatonId = rand.Next(1, 100),
-                ReactionCount = rand.Next(1, 100),
-                ViewCount = rand.Next(1, 100),
-                Content = new string(Enumerable.Repeat(0, rand.Next(1, 30)).Select(a => alphabet[rand.Next(alphabet.Length)]).ToArray()),
-                Title = new string(Enumerable.Repeat(0, rand.Next(1, 30)).Select(a => alphabet[rand.Next(alphabet.Length)]).ToArray())
-            };
+                if (p.PropertyType == typeof(int))
+                {
+                    p.SetValue(ent, rand.Next(1, 100));
+                }
+                else if (p.PropertyType == typeof(string))
+                {
+                    var genString = new string(Enumerable.Repeat(0, rand.Next(1, 30)).Select(a => alphabet[rand.Next(alphabet.Length)]).ToArray());
+                    p.SetValue(ent, genString);
+                }
+            });
+            return ent;
         }
     }
 }
