@@ -14,31 +14,30 @@ namespace Brokers.DAL.Producers
         static IModel channel;
         static IConnection connection;
         private string queueName;
+        RabbitMQSettings config;
 
         public RabbitMQProducer(RabbitMQSettings config)
         {
-            try
-            {
-                InitConnection(config);
-            }
-            catch
-            {
-                throw new Exception("Unable connect to RabbitMQ");
-            }
+            this.config = config;
+            //try
+            //{
+            //    InitConnection(config);
+            //}
+            //catch
+            //{
+            //    throw new Exception("Unable connect to RabbitMQ");
+            //}
         }
         public void Dispose()
         {
             channel.Close();
             connection.Close();
-            channel.Dispose();
-            connection.Dispose();
-            channel = null;
-            connection = null;
         }
 
         public void Initialize()
         {
-            var cf = new ConnectionFactory();
+            var cf = GetConnectionFactory(config);
+
             connection = cf.CreateConnection();
             channel = connection.CreateModel();
             channel.QueueDeclare("messages", true, false, false, null);
@@ -48,20 +47,6 @@ namespace Brokers.DAL.Producers
         {
             byte[] messageBodyBytes = Encoding.UTF8.GetBytes(message);
             channel.BasicPublish("main", "", null, messageBodyBytes);
-        }
-
-        private void InitConnection(RabbitMQSettings config)
-        {
-            var cf = GetConnectionFactory(config);
-
-            queueName = config.QueueName;
-
-            connection = cf.CreateConnection();
-
-            channel = connection.CreateModel();
-            channel.ExchangeDeclare("main", "fanout");
-            channel.QueueDeclare(queueName, true, false, false, null);
-            channel.QueueBind(queueName, "main", "", null);
         }
 
         private ConnectionFactory GetConnectionFactory(RabbitMQSettings config)

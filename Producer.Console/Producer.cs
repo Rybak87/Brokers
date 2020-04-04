@@ -41,6 +41,7 @@ namespace Producer.Console
                     RabbitMQSettings settings = (RabbitMQSettings)ConfigurationManager.GetSection("rabbitMQSettings");
                     producer = new RabbitMQProducer(settings);
                 }
+                producer.Initialize();
             }
             catch (Exception ex)
             {
@@ -48,9 +49,7 @@ namespace Producer.Console
                 System.Console.Read();
                 return;
             }
-
-                                 
-            producer.Initialize();
+            
             string input = string.Empty;
             System.Console.WriteLine("For exit enter \"X\"");
             System.Console.WriteLine("Enter count random messages");
