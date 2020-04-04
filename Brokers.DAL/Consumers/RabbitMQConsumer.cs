@@ -10,7 +10,7 @@ using System.Text;
 namespace Brokers.DAL.Consumers
 {
 
-    public class RabbitMQConsumer : IMessageConsumer//IDisposable
+    public class RabbitMQConsumer : IMessageConsumer
     {
         private IConnection connection;
         private IModel channel;
@@ -38,11 +38,9 @@ namespace Brokers.DAL.Consumers
 
         private void InitConnection(RabbitMQSettings config)
         {
-            var cf = GetConnectionFactory(config);
-
             queueName = config.QueueName;
 
-            connection = cf.CreateConnection();
+            connection = config.CreateConnection();
             connection.ConnectionShutdown += (o, e) => { logger.WriteError("Сервер не отвечает"); };
             connection.CallbackException += (o, e) => { logger.WriteError(e.Exception.Message); };
 
@@ -80,30 +78,6 @@ namespace Brokers.DAL.Consumers
                 return;
             }
             NewMessage?.BeginInvoke(message, null, null);
-        }
-
-        private ConnectionFactory GetConnectionFactory(RabbitMQSettings config)
-        {
-            var cf = new ConnectionFactory();
-            cf.AutomaticRecoveryEnabled = config.AutomaticRecoveryEnabled;
-            cf.ContinuationTimeout = config.ContinuationTimeout;
-            cf.DispatchConsumersAsync = config.DispatchConsumersAsync;
-            cf.HandshakeContinuationTimeout = config.HandshakeContinuationTimeout;
-            cf.HostName = config.HostName;
-            cf.NetworkRecoveryInterval = config.NetworkRecoveryInterval;
-            cf.Password = config.Password;
-            cf.Port = config.Port;
-            cf.RequestedChannelMax = config.RequestedChannelMax;
-            cf.RequestedConnectionTimeout = config.RequestedConnectionTimeout;
-            cf.RequestedFrameMax = config.RequestedFrameMax;
-            cf.RequestedHeartbeat = config.RequestedHeartbeat;
-            cf.SocketReadTimeout = config.SocketReadTimeout;
-            cf.TopologyRecoveryEnabled = config.TopologyRecoveryEnabled;
-            cf.UseBackgroundThreadsForIO = config.UseBackgroundThreadsForIO;
-            cf.UserName = config.UserName;
-            cf.VirtualHost = config.VirtualHost;
-
-            return cf;
         }
     }
 }

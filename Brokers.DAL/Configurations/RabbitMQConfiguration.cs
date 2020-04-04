@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RabbitMQ.Client;
+using System;
 using System.Configuration;
 
 namespace Brokers.DAL.Configurations
@@ -112,6 +113,32 @@ namespace Brokers.DAL.Configurations
         public string VirtualHost
         {
             get { return (string)base["virtualHost"]; }
+        }
+
+        public IConnection CreateConnection() => GetConnectionFactory().CreateConnection();
+
+        public ConnectionFactory GetConnectionFactory()
+        {
+            var cf = new ConnectionFactory();
+            cf.AutomaticRecoveryEnabled = AutomaticRecoveryEnabled;
+            cf.ContinuationTimeout = ContinuationTimeout;
+            cf.DispatchConsumersAsync = DispatchConsumersAsync;
+            cf.HandshakeContinuationTimeout = HandshakeContinuationTimeout;
+            cf.HostName = HostName;
+            cf.NetworkRecoveryInterval = NetworkRecoveryInterval;
+            cf.Password = Password;
+            cf.Port = Port;
+            cf.RequestedChannelMax = RequestedChannelMax;
+            cf.RequestedConnectionTimeout = RequestedConnectionTimeout;
+            cf.RequestedFrameMax = RequestedFrameMax;
+            cf.RequestedHeartbeat = RequestedHeartbeat;
+            cf.SocketReadTimeout = SocketReadTimeout;
+            cf.TopologyRecoveryEnabled = TopologyRecoveryEnabled;
+            cf.UseBackgroundThreadsForIO = UseBackgroundThreadsForIO;
+            cf.UserName = UserName;
+            cf.VirtualHost = VirtualHost;
+
+            return cf;
         }
     }
 }

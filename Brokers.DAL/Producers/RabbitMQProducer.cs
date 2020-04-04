@@ -26,9 +26,7 @@ namespace Brokers.DAL.Producers
         {
             try
             {
-                var cf = GetConnectionFactory(config);
-
-                connection = cf.CreateConnection();
+                connection = config.CreateConnection();
                 channel = connection.CreateModel();
                 channel.QueueDeclare("messages", true, false, false, null);
 
@@ -43,30 +41,6 @@ namespace Brokers.DAL.Producers
         {
             byte[] messageBodyBytes = Encoding.UTF8.GetBytes(message);
             channel.BasicPublish("main", "", null, messageBodyBytes);
-        }
-
-        private ConnectionFactory GetConnectionFactory(RabbitMQSettings config)
-        {
-            var cf = new ConnectionFactory();
-            cf.AutomaticRecoveryEnabled = config.AutomaticRecoveryEnabled;
-            cf.ContinuationTimeout = config.ContinuationTimeout;
-            cf.DispatchConsumersAsync = config.DispatchConsumersAsync;
-            cf.HandshakeContinuationTimeout = config.HandshakeContinuationTimeout;
-            cf.HostName = config.HostName;
-            cf.NetworkRecoveryInterval = config.NetworkRecoveryInterval;
-            cf.Password = config.Password;
-            cf.Port = config.Port;
-            cf.RequestedChannelMax = config.RequestedChannelMax;
-            cf.RequestedConnectionTimeout = config.RequestedConnectionTimeout;
-            cf.RequestedFrameMax = config.RequestedFrameMax;
-            cf.RequestedHeartbeat = config.RequestedHeartbeat;
-            cf.SocketReadTimeout = config.SocketReadTimeout;
-            cf.TopologyRecoveryEnabled = config.TopologyRecoveryEnabled;
-            cf.UseBackgroundThreadsForIO = config.UseBackgroundThreadsForIO;
-            cf.UserName = config.UserName;
-            cf.VirtualHost = config.VirtualHost;
-
-            return cf;
         }
     }
 }
