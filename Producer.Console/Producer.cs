@@ -5,12 +5,7 @@ using Brokers.DAL.Model;
 using Brokers.DAL.Producers;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Producer.Console
 {
@@ -46,25 +41,28 @@ namespace Producer.Console
             catch (Exception ex)
             {
                 System.Console.WriteLine(ex.Message);
+                producer?.Dispose();
                 System.Console.Read();
                 return;
             }
-            
-            string input = string.Empty;
+
             System.Console.WriteLine("For exit enter \"X\"");
             System.Console.WriteLine("Enter count random messages");
-            
+
+
+            Sending();
+        }
+
+        private static void Sending()
+        {
+            string input = string.Empty;
             try
             {
                 while (input != "X")
                 {
                     input = System.Console.ReadLine();
-                    int count = 0;
-                    try
-                    {
-                        count = Convert.ToInt32(input);
-                    }
-                    catch
+
+                    if (!int.TryParse(input, out int count))
                     {
                         System.Console.WriteLine("Enter a number");
                     }
@@ -76,7 +74,7 @@ namespace Producer.Console
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 System.Console.WriteLine(ex.Message);
             }

@@ -46,7 +46,7 @@ namespace Brokers.DAL.Console
                 return;
             }
 
-            consumer.NewMessage += HandlingMessage;// (работает)
+            consumer.NewMessage += HandlingMessage;
             consumer.StartConsume();
 
             System.Console.Read();

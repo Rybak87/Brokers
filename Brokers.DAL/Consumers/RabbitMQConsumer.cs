@@ -62,8 +62,8 @@ namespace Brokers.DAL.Consumers
 
         public void Close()
         {
-            channel.Close();
-            connection.Close();
+            channel?.Close();
+            connection?.Close();
         }
 
         private void Receive(object sender, BasicDeliverEventArgs e)

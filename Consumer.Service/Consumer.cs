@@ -3,7 +3,6 @@ using Brokers.DAL.Consumers;
 using Brokers.DAL.Interfaces;
 using Brokers.DAL.Loggers;
 using Brokers.DAL.Model;
-using log4net;
 using System;
 using System.Configuration;
 using System.Data;

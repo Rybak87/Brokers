@@ -2,10 +2,7 @@
 using Brokers.DAL.Interfaces;
 using RabbitMQ.Client;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Brokers.DAL.Producers
 {
@@ -13,34 +10,33 @@ namespace Brokers.DAL.Producers
     {
         static IModel channel;
         static IConnection connection;
-        private string queueName;
         RabbitMQSettings config;
 
         public RabbitMQProducer(RabbitMQSettings config)
         {
             this.config = config;
-            //try
-            //{
-            //    InitConnection(config);
-            //}
-            //catch
-            //{
-            //    throw new Exception("Unable connect to RabbitMQ");
-            //}
         }
         public void Dispose()
         {
-            channel.Close();
-            connection.Close();
+            channel?.Close();
+            connection?.Close();
         }
 
         public void Initialize()
         {
-            var cf = GetConnectionFactory(config);
+            try
+            {
+                var cf = GetConnectionFactory(config);
 
-            connection = cf.CreateConnection();
-            channel = connection.CreateModel();
-            channel.QueueDeclare("messages", true, false, false, null);
+                connection = cf.CreateConnection();
+                channel = connection.CreateModel();
+                channel.QueueDeclare("messages", true, false, false, null);
+
+            }
+            catch
+            {
+                throw new Exception("Unable connect to RabbitMQ");
+            }
         }
 
         public void SendRequest(string message)

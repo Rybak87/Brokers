@@ -1,11 +1,7 @@
 ﻿using Brokers.DAL.Interfaces;
 using Confluent.Kafka;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Brokers.DAL.Producers
 {
@@ -14,7 +10,7 @@ namespace Brokers.DAL.Producers
         static IProducer<Null, string> producer;
         public void Dispose()
         {
-            producer.Dispose();
+            producer?.Dispose();
         }
 
         public void Initialize()
