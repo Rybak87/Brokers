@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Producer.Kafka.Console", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Producer.Console", "Producer.Console\Producer.Console.csproj", "{D6751DBA-3FF1-49AC-9132-3A43259D9CF4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OldVersion Poducer", "OldVersion Poducer", "{627064AD-790C-458C-B648-D810537D5147}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AB14A6E8-E841-40A0-8D0B-6F62272772D3} = {627064AD-790C-458C-B648-D810537D5147}
+		{2BCE2400-B085-44DE-B4FD-34B444E1CE40} = {627064AD-790C-458C-B648-D810537D5147}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C38D8A5E-E360-46EB-8895-5D8990F4C813}

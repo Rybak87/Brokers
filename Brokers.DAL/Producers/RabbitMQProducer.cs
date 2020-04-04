@@ -30,13 +30,16 @@ namespace Brokers.DAL.Producers
         {
             channel.Close();
             connection.Close();
+            channel.Dispose();
+            connection.Dispose();
+            channel = null;
+            connection = null;
         }
 
         public void Initialize()
         {
             var cf = new ConnectionFactory();
             connection = cf.CreateConnection();
-
             channel = connection.CreateModel();
             channel.QueueDeclare("messages", true, false, false, null);
         }

@@ -34,8 +34,7 @@ namespace Producer.Console
                 if (choice == "K")
                 {
                     //TODO: KafkaSettings
-                    //TODO: KafkaProducer
-                    //producer = new KafkaProducer();
+                    producer = new KafkaProducer();
                 }
                 else
                 {
@@ -53,6 +52,7 @@ namespace Producer.Console
                                  
             producer.Initialize();
             string input = string.Empty;
+            System.Console.WriteLine("For exit enter \"X\"");
             System.Console.WriteLine("Enter count random messages");
             
             try
