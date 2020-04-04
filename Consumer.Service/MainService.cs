@@ -12,7 +12,7 @@ namespace Consumer.Service
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Consumer()
+                new ConsumerService()
             };
             ServiceBase.Run(ServicesToRun);
         }
