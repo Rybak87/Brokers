@@ -1,4 +1,5 @@
 ﻿using Brokers.DAL.Interfaces;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +10,27 @@ namespace Brokers.DAL.Producers
 {
     public class RabbitMQProducer : IProducer
     {
+        static IModel channel;
+        static IConnection conn;
         public void Dispose()
         {
-            throw new NotImplementedException();
+            channel.Close();
+            conn.Close();
         }
 
         public void Initialize()
         {
-            throw new NotImplementedException();
+            var cf = new ConnectionFactory();
+            conn = cf.CreateConnection();
+
+            channel = conn.CreateModel();
+            channel.QueueDeclare("messages", true, false, false, null);
         }
 
-        public void SendRequest(string request)
+        public void SendRequest(string message)
         {
-            throw new NotImplementedException();
+            byte[] messageBodyBytes = Encoding.UTF8.GetBytes(message);
+            channel.BasicPublish("main", "", null, messageBodyBytes);
         }
     }
 }

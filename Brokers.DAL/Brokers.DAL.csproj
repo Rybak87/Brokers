@@ -72,7 +72,9 @@
     <Compile Include="Configurations\RabbitMQConfiguration.cs" />
     <Compile Include="Consumers\KafkaConsumer.cs" />
     <Compile Include="Consumers\RabbitMQConsumer.cs" />
+    <Compile Include="Generator\SimpleGenerator.cs" />
     <Compile Include="Interfaces\IConsumer.cs" />
+    <Compile Include="Interfaces\IGenerator.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\IProducer.cs" />
     <Compile Include="Loggers\Log4Net.cs" />
