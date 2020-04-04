@@ -36,12 +36,19 @@ namespace Brokers.DAL.Consumers
 
         private void Initialize()
         {
-            config = new ConsumerConfig()
+            try
             {
-                BootstrapServers = "localhost",
-                GroupId = "abc",
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-            };
+                config = new ConsumerConfig()
+                {
+                    BootstrapServers = "localhost",
+                    GroupId = "abc",
+                    AutoOffsetReset = AutoOffsetReset.Earliest,
+                };
+            }
+            catch
+            {
+                throw new Exception("Unable connect to RabbitMQ");
+            }
         }
         private async Task Receive(CancellationToken cancellationToken)
         {

@@ -9,6 +9,6 @@ namespace Brokers.DAL.Interfaces
     public interface IProducer: IDisposable
     {
         void Initialize();
-        void SendRequest(string request);
+        void SendRequest(string message);
     }
 }

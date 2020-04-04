@@ -21,7 +21,7 @@ namespace Brokers.DAL.Producers
             {
                 InitConnection(config);
             }
-            catch (Exception ex)
+            catch
             {
                 throw new Exception("Unable connect to RabbitMQ");
             }
