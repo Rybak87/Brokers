@@ -18,10 +18,19 @@ namespace Brokers.DAL.Console
 
         static void Main(string[] args)
         {
+            System.Console.WriteLine("Select a broker: \"R\" - RabbitMQ, \"K\" - Kafka");
+            string choice = System.Console.ReadLine();
+            while (choice != "R" && choice != "K")
+            {
+                System.Console.WriteLine("Try again");
+                choice = System.Console.ReadLine();
+            }
+
             try
             {
-                if (args.Contains("kafka"))
+                if (choice == "K")
                 {
+                    //TODO: KafkaSettings
                     consumer = new KafkaConsumer(logger);
                 }
                 else
