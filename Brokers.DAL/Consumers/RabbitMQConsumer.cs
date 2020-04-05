@@ -31,7 +31,7 @@ namespace Brokers.DAL.Consumers
             }
             catch (Exception ex)
             {
-                logger.WriteError(ex.Message);
+                logger.Error(ex.Message);
                 throw new Exception("Unable connect to RabbitMQ");
             }
         }
@@ -41,11 +41,11 @@ namespace Brokers.DAL.Consumers
             queueName = config.QueueName;
 
             connection = config.CreateConnection();
-            connection.ConnectionShutdown += (o, e) => { logger.WriteError("Сервер не отвечает"); };
-            connection.CallbackException += (o, e) => { logger.WriteError(e.Exception.Message); };
+            connection.ConnectionShutdown += (o, e) => { logger.Error("Сервер не отвечает"); };
+            connection.CallbackException += (o, e) => { logger.Error(e.Exception.Message); };
 
             channel = connection.CreateModel();
-            channel.ExchangeDeclare("main", "fanout");
+            channel.ExchangeDeclare("main", "fanout", durable:true);
             channel.QueueDeclare(queueName, true, false, false, null);
             channel.QueueBind(queueName, "main", "", null);
 
@@ -66,18 +66,16 @@ namespace Brokers.DAL.Consumers
 
         private void Receive(object sender, BasicDeliverEventArgs e)
         {
-            Message message;
             try
             {
                 var consumeResult = Encoding.UTF8.GetString(e.Body);
-                message = JsonConvert.DeserializeObject<Message>(consumeResult);
+                var message = JsonConvert.DeserializeObject<Message>(consumeResult);
+                NewMessage?.Invoke(message); // Message handling code can throw exceptions we need to ensure the service does not leave unhandled exception.
             }
             catch (Exception ex)
             {
-                logger.WriteError(ex.Message);
-                return;
+                logger.Error(ex.Message);
             }
-            NewMessage?.BeginInvoke(message, null, null);
         }
     }
 }

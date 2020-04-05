@@ -69,7 +69,7 @@ namespace Brokers.DAL.Consumers
                         }
                         catch (Exception ex)
                         {
-                            logger.WriteError(ex.Message);
+                            logger.Error(ex.Message);
                         }
                     }
                     consumer.Close();

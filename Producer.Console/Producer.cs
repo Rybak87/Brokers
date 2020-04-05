@@ -12,7 +12,7 @@ namespace Producer.Console
     public class Producer
     {
         static IProducer producer;
-        static IGenerator<Message> generator = new SimpleGenerator<Message>();
+        static readonly IGenerator<Message> generator = new RandomPublicationGenerator();
 
         static void Main(string[] args)
         {

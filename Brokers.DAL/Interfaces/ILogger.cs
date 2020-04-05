@@ -4,7 +4,10 @@ namespace Brokers.DAL.Interfaces
 {
     public interface ILogger
     {
-        void WriteError(string message);
+        void Error(string message);
+        
+        void Debug(string message);
+
         ICollection InitLogger();
     }
 }

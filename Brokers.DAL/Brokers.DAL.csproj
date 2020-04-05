@@ -72,6 +72,7 @@
     <Compile Include="Configurations\RabbitMQConfiguration.cs" />
     <Compile Include="Consumers\KafkaConsumer.cs" />
     <Compile Include="Consumers\RabbitMQConsumer.cs" />
+    <Compile Include="Generator\RandomPublicationGenerator.cs" />
     <Compile Include="Generator\SimpleGenerator.cs" />
     <Compile Include="Interfaces\IConsumer.cs" />
     <Compile Include="Interfaces\IGenerator.cs" />
@@ -85,6 +86,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TextPatterns.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

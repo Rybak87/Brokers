@@ -5,18 +5,15 @@ using Brokers.DAL.Loggers;
 using Brokers.DAL.Model;
 using System;
 using System.Configuration;
-using System.Data;
-using System.IO;
-using System.Linq;
 using System.ServiceProcess;
+using Newtonsoft.Json;
 
 namespace Consumer.Service
 {
     public partial class ConsumerService : ServiceBase
     {
-        static IMessageConsumer consumer;
-        static ILogger logger = new Log4Net("loggerLog4net");
-        static object locker = new object();
+        private readonly IMessageConsumer consumer;
+        private readonly ILogger logger = new Log4Net("loggerLog4net");
 
         public ConsumerService()
         {
@@ -24,26 +21,20 @@ namespace Consumer.Service
 
             try
             {
-                var settings = (RabbitMQSettings)ConfigurationManager.GetSection("rabbitMQSettings");
+                var settings = (RabbitMQSettings) ConfigurationManager.GetSection("rabbitMQSettings");
                 consumer = new RabbitMQConsumer(settings, logger);
-                //consumer = new KafkaConsumer(logger);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.Read();
-                return;
+                logger.Error(ex.Message);
+                consumer?.Close();
+                throw;
             }
-
-            consumer.StartConsume();
-            //consumer.NewMessage += HandlingMessage;
-
-            Console.Read();
-            consumer.Close();
         }
 
         protected override void OnStart(string[] args)
         {
+            consumer.NewMessage += HandlingMessage;
             consumer.StartConsume();
         }
 
@@ -52,22 +43,9 @@ namespace Consumer.Service
             consumer.Close();
         }
 
-        private static void HandlingMessage(Message message)
+        private void HandlingMessage(Message message)
         {
-            var props = typeof(Message).GetProperties().Select(p => new { name = p.Name, value = p.GetValue(message) });
-
-            lock (locker)
-            {
-                using (var sw = new StreamWriter("C:\\Consumer\\Messages.txt"))
-                {
-
-                    foreach (var item in props)
-                    {
-                        sw.WriteLine(string.Format($"{item.name} = {item.value}"));
-                        sw.WriteLine();
-                    }
-                }
-            }
+            logger.Debug(JsonConvert.SerializeObject(message));
         }
     }
 }
