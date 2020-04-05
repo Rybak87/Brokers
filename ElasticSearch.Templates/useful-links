@@ -1,0 +1,11 @@
+List ES existing indexes:
+http://localhost:9200/_cat/indices?v&pretty
+
+View existing template ('messages' is a template name):
+http://localhost:9200/_template/messages?pretty
+
+View existing index structure ('messages' is our index name):
+http://localhost:9200/messages?pretty
+
+Get first 10 documents from the index:
+http://localhost:9200/messages/_search?pretty

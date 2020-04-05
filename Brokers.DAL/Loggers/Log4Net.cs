@@ -18,9 +18,15 @@ namespace Brokers.DAL.Loggers
         {
             return XmlConfigurator.Configure();
         }
-        public void WriteError(string message)
+
+        public void Error(string message)
         {
             Log.Error(message);
+        }
+
+        public void Debug(string message)
+        {
+            Log.Debug(message);
         }
     }
 }

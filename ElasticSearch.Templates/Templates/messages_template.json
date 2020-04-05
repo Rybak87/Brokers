@@ -1,0 +1,56 @@
+{
+    "template": "messages*",
+    
+    "settings": {
+        "index.mapper.dynamic": false,
+        "index.max_result_window": 500000,
+        "number_of_replicas": 0
+    },
+
+    "mappings": {
+
+        "Message": {
+
+            "_all": {
+                "enabled": false
+            },
+            
+            "dynamic": false,
+      
+            "properties": {
+
+                "PublicatonId": {
+                    "type": "long"
+                },
+
+                "PublicationDate": {
+                    "type": "date"
+                },
+
+                "AuthorId": {
+                    "type": "integer"
+                },
+
+                "HostId": {
+                    "type": "integer"
+                },
+
+                "ReactionCount": {
+                    "type": "integer"
+                },
+
+                "ViewCount": {
+                    "type": "integer"
+                },
+
+                "Title": {
+                    "type": "text"
+                },
+
+                "Content": {
+                    "type": "text"
+                }
+            }
+        }
+    }
+}
