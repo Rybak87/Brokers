@@ -45,7 +45,7 @@ namespace Brokers.DAL.Consumers
             connection.CallbackException += (o, e) => { logger.Error(e.Exception.Message); };
 
             channel = connection.CreateModel();
-            channel.ExchangeDeclare("main", "fanout", durable:true);
+            channel.ExchangeDeclare("main", "fanout", durable: true);
             channel.QueueDeclare(queueName, true, false, false, null);
             channel.QueueBind(queueName, "main", "", null);
 

@@ -3,18 +3,19 @@ using Brokers.DAL.Consumers;
 using Brokers.DAL.Interfaces;
 using Brokers.DAL.Loggers;
 using Brokers.DAL.Model;
+using Nest;
 using System;
 using System.Configuration;
 using System.Linq;
 
-namespace Brokers.DAL.Console
+namespace Consumer.Console
 {
-    class Consumer
+    public class Consumer
     {
         static IMessageConsumer consumer;
         static ILogger logger = new Log4Net("loggerLog4net");
         static object locker = new object();
-
+        static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhsot:9200")));
 
         static void Main(string[] args)
         {
@@ -39,11 +40,13 @@ namespace Brokers.DAL.Console
             }
 
             consumer.NewMessage += HandlingMessage;
+            consumer.NewMessage += ResendMessageToES;
             consumer.StartConsume();
 
             System.Console.Read();
             consumer.Close();
         }
+
         private static void HandlingMessage(Message message)
         {
             var props = typeof(Message).GetProperties().Select(p => new { name = p.Name, value = p.GetValue(message) });
@@ -55,6 +58,11 @@ namespace Brokers.DAL.Console
                 }
                 System.Console.WriteLine();
             }
+        }
+
+        private static void ResendMessageToES(Message message)
+        {
+            var indexResponse = esClient.Index(message);
         }
     }
 }
