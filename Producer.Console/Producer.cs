@@ -6,6 +6,7 @@ using Brokers.DAL.Producers;
 using Newtonsoft.Json;
 using System;
 using System.Configuration;
+using System.Linq;
 
 namespace Producer.Console
 {
@@ -16,17 +17,9 @@ namespace Producer.Console
 
         static void Main(string[] args)
         {
-            System.Console.WriteLine("Select a broker: \"R\" - RabbitMQ, \"K\" - Kafka");
-            string choice = System.Console.ReadLine();
-            while (choice != "R" && choice != "K")
-            {
-                System.Console.WriteLine("Try again");
-                choice = System.Console.ReadLine();
-            }
-
             try
             {
-                if (choice == "K")
+                if (args.Select(s => s.ToLower()).Contains("kafka"))
                 {
                     //TODO: KafkaSettings
                     producer = new KafkaProducer();
@@ -48,7 +41,6 @@ namespace Producer.Console
 
             System.Console.WriteLine("For exit enter \"X\"");
             System.Console.WriteLine("Enter count random messages");
-
 
             Sending();
         }
