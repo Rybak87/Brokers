@@ -15,10 +15,14 @@ namespace Consumer.Console
         static IMessageConsumer consumer;
         static ILogger logger = new Log4Net("loggerLog4net");
         static object locker = new object();
-        static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhsot:9200")));
+        static readonly string nameIndex = "messages";
+        static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
 
         static void Main(string[] args)
         {
+            if (!esClient.IndexExists(nameIndex).Exists)
+                CreateIndex();
+
             try
             {
                 if (args.Select(s => s.ToLower()).Contains("kafka"))
@@ -47,6 +51,16 @@ namespace Consumer.Console
             consumer.Close();
         }
 
+        private static void CreateIndex()
+        {
+            esClient.CreateIndex(nameIndex, c => c
+                .Mappings(ms => ms
+                    .Map<Message>(m => m
+                    )
+                )
+            );
+        }
+
         private static void HandlingMessage(Message message)
         {
             var props = typeof(Message).GetProperties().Select(p => new { name = p.Name, value = p.GetValue(message) });
@@ -62,7 +76,7 @@ namespace Consumer.Console
 
         private static void ResendMessageToES(Message message)
         {
-            var indexResponse = esClient.Index(message);
+            var indexResponse = esClient.Index(message, x => x.Id(new Id(message.PublicatonId)));
         }
     }
 }
