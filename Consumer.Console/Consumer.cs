@@ -3,32 +3,31 @@ using Brokers.DAL.Consumers;
 using Brokers.DAL.Interfaces;
 using Brokers.DAL.Loggers;
 using Brokers.DAL.Model;
+using Nest;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 
-namespace Brokers.DAL.Console
+namespace Consumer.Console
 {
-    class Consumer
+    public class Consumer
     {
         static IMessageConsumer consumer;
         static ILogger logger = new Log4Net("loggerLog4net");
         static object locker = new object();
-
+        static readonly string nameIndex = "messages";
+        static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
 
         static void Main(string[] args)
         {
-            System.Console.WriteLine("Select a broker: \"R\" - RabbitMQ, \"K\" - Kafka");
-            string choice = System.Console.ReadLine();
-            while (choice != "R" && choice != "K")
-            {
-                System.Console.WriteLine("Try again");
-                choice = System.Console.ReadLine();
-            }
+            if (!esClient.IndexExists(nameIndex).Exists)
+                CreateIndex();
 
             try
             {
-                if (choice == "K")
+                if (args.Select(s => s.ToLower()).Contains("kafka"))
                 {
                     //TODO: KafkaSettings
                     consumer = new KafkaConsumer(logger);
@@ -47,11 +46,23 @@ namespace Brokers.DAL.Console
             }
 
             consumer.NewMessage += HandlingMessage;
+            consumer.NewMessage += ResendMessageToES;
             consumer.StartConsume();
 
             System.Console.Read();
             consumer.Close();
         }
+
+        private static void CreateIndex()
+        {
+            esClient.CreateIndex(nameIndex, c => c
+                .Mappings(ms => ms
+                    .Map<Message>(m => m
+                    )
+                )
+            );
+        }
+
         private static void HandlingMessage(Message message)
         {
             var props = typeof(Message).GetProperties().Select(p => new { name = p.Name, value = p.GetValue(message) });
@@ -63,6 +74,11 @@ namespace Brokers.DAL.Console
                 }
                 System.Console.WriteLine();
             }
+        }
+
+        private static void ResendMessageToES(Message message)
+        {
+            var indexResponse = esClient.Index(message, x => x.Id(new Id(message.PublicatonId)));
         }
     }
 }
