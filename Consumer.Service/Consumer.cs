@@ -7,6 +7,7 @@ using System;
 using System.Configuration;
 using System.ServiceProcess;
 using Newtonsoft.Json;
+using Nest;
 
 namespace Consumer.Service
 {
@@ -14,6 +15,8 @@ namespace Consumer.Service
     {
         private readonly IMessageConsumer consumer;
         private readonly ILogger logger = new Log4Net("loggerLog4net");
+        static readonly string nameIndex = "messages";
+        static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
 
         public ConsumerService()
         {
@@ -35,6 +38,7 @@ namespace Consumer.Service
         protected override void OnStart(string[] args)
         {
             consumer.NewMessage += HandlingMessage;
+            consumer.NewMessage += ResendMessageToES;
             consumer.StartConsume();
         }
 
@@ -46,6 +50,11 @@ namespace Consumer.Service
         private void HandlingMessage(Message message)
         {
             logger.Debug(JsonConvert.SerializeObject(message));
+        }
+
+        private static void ResendMessageToES(Message message)
+        {
+            _ = esClient.Index(message, i => i.Id(message.PublicatonId));
         }
     }
 }
