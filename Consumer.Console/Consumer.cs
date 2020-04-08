@@ -22,9 +22,6 @@ namespace Consumer.Console
 
         static void Main(string[] args)
         {
-            if (!esClient.IndexExists(nameIndex).Exists)
-                CreateIndex();
-
             try
             {
                 if (args.Select(s => s.ToLower()).Contains("kafka"))
@@ -45,22 +42,12 @@ namespace Consumer.Console
                 return;
             }
 
-            consumer.NewMessage += HandlingMessage;
+            //consumer.NewMessage += HandlingMessage;
             consumer.NewMessage += ResendMessageToES;
             consumer.StartConsume();
 
             System.Console.Read();
             consumer.Close();
-        }
-
-        private static void CreateIndex()
-        {
-            esClient.CreateIndex(nameIndex, c => c
-                .Mappings(ms => ms
-                    .Map<Message>(m => m
-                    )
-                )
-            );
         }
 
         private static void HandlingMessage(Message message)
@@ -78,7 +65,7 @@ namespace Consumer.Console
 
         private static void ResendMessageToES(Message message)
         {
-            var indexResponse = esClient.Index(message, x => x.Id(new Id(message.PublicatonId)));
+            _ = esClient.Index(message, i => i.Id(message.PublicatonId));
         }
     }
 }

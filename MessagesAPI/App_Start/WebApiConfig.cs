@@ -15,16 +15,10 @@ namespace MessagesAPI
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
-                name: "Root",
+                name: "Author",
                 routeTemplate: "api/GetTopAuthorsByViews",
-                defaults: new { controller = "values"}
+                defaults: new { controller = "author"}
             );
-            //config.Routes.MapHttpRoute(
-            //    name: "DefaultApi",
-            //    routeTemplate: "api/{controller}/{id}",
-            //    defaults: new { id = RouteParameter.Optional }
-            //);
-
         }
     }
 }
