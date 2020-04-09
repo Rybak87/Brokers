@@ -13,9 +13,14 @@ namespace MessagesAPI.Controllers
 {
     public class AuthorController : ApiController
     {
-        static readonly string nameIndex = "messages";
-        static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
+        readonly string nameIndex/* = "messages"*/;
+        readonly ElasticClient esClient;
 
+        public AuthorController(string nameIndex = "messages")
+        {
+            this.nameIndex = nameIndex;
+            esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
+        }
         //Template
         //http://localhost:54413/api/GetTopAuthorsByViews?fromDate=01.01.2020&toDate=14.01.2020&limit=1
         [HttpGet]
