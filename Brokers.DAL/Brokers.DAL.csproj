@@ -78,13 +78,16 @@
     <Compile Include="Configurations\RabbitMQConfiguration.cs" />
     <Compile Include="Consumers\KafkaConsumer.cs" />
     <Compile Include="Consumers\RabbitMQConsumer.cs" />
+    <Compile Include="Elastic\ElasticCalculation.cs" />
     <Compile Include="Generator\RandomPublicationGenerator.cs" />
     <Compile Include="Generator\SimpleGenerator.cs" />
     <Compile Include="Interfaces\IConsumer.cs" />
     <Compile Include="Interfaces\IGenerator.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
+    <Compile Include="Interfaces\IMessagesReportBuilder.cs" />
     <Compile Include="Interfaces\IProducer.cs" />
     <Compile Include="Loggers\Log4Net.cs" />
+    <Compile Include="Model\AuthorTotals.cs" />
     <Compile Include="Model\Message.cs" />
     <Compile Include="Producers\KafkaProducer.cs" />
     <Compile Include="Producers\RabbitMQProducer.cs" />
