@@ -13,13 +13,14 @@ namespace Brokers.DAL.Elastic
     {
         readonly ElasticClient esClient;
 
-        public ElasticCalculation()
-        {
-
-        }
-        public ElasticCalculation(string nameIndex = "messages")
+        public ElasticCalculation(string nameIndex)
         {
             esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
+        }
+
+        public ElasticCalculation(ElasticClient esClient)
+        {
+            this.esClient = esClient;
         }
 
         public IEnumerable<AuthorTotals> GetTopAuthorsByViews(DateTime fromDate, DateTime toDate, int limit)

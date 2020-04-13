@@ -11,13 +11,13 @@ namespace MessagesAPI.Controllers
     {
         readonly IMessagesReportBuilder messagesReportBuilder;
 
-        public AuthorController(/*IMessagesReportBuilder messagesReportBuilder*/)
+        public AuthorController(IMessagesReportBuilder messagesReportBuilder)
         {
-            //this.messagesReportBuilder = messagesReportBuilder;
+            this.messagesReportBuilder = messagesReportBuilder;
         }
 
         //Template
-        //http://localhost:54413/api/GetTopAuthorsByViews?fromDate=01.01.2020&toDate=14.01.2020&limit=1
+        //http://localhost:54413/api/GetTopAuthorsByViews?fromDate=01.01.2020&toDate=01.14.2020&limit=1
 
         [HttpGet]
         public HttpResponseMessage GetTopAuthorsByViews(DateTime fromDate, DateTime toDate, int limit)

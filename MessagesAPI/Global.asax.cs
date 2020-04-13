@@ -14,10 +14,8 @@ namespace MessagesAPI
     {
         protected void Application_Start()
         {
+            AutofacConfig.ConfigureContainer();
             GlobalConfiguration.Configure(WebApiConfig.Register);
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            //AutofacConfig.ConfigureContainer();
         }
     }
 }
