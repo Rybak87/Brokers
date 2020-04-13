@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Web.Http;
+using Brokers.DAL.Elastic;
 using Brokers.DAL.Generator;
 using Brokers.DAL.Interfaces;
 using Brokers.DAL.Model;
 using MessagesAPI.Controllers;
-using MessagesAPI.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nest;
 
@@ -20,7 +20,7 @@ namespace TestMessagesAPI
         static readonly string nameIndex = "messagestest";
         static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
         static readonly IGenerator<Message> generator = new RandomPublicationGenerator();
-        static readonly AuthorController controller = new AuthorController(nameIndex);
+        static readonly AuthorController controller = new AuthorController(new ElasticCalculation(nameIndex));
 
 
         public UnitTest()
@@ -56,8 +56,8 @@ namespace TestMessagesAPI
             Thread.Sleep(1000);
 
             var response = controller.GetTopAuthorsByViews(fromDate, toDate, 3);
-            var content = response.Content as ObjectContent<IEnumerable<AuthorTotalViewResult>>;
-            var result = (content.Value as IEnumerable<AuthorTotalViewResult>)?.FirstOrDefault();
+            var content = response.Content as ObjectContent<IEnumerable<AuthorTotals>>;
+            var result = (content.Value as IEnumerable<AuthorTotals>)?.FirstOrDefault();
 
 
 
@@ -97,13 +97,13 @@ namespace TestMessagesAPI
             Thread.Sleep(1000);
 
             var response = controller.GetTopAuthorsByViews(fromDate, toDate, limit);
-            var content = response.Content as ObjectContent<IEnumerable<AuthorTotalViewResult>>;
-            var result = (content.Value as IEnumerable<AuthorTotalViewResult>).ToArray();
+            var content = response.Content as ObjectContent<IEnumerable<AuthorTotals>>;
+            var result = (content.Value as IEnumerable<AuthorTotals>).ToArray();
 
             var sample = messages
                 .Where(m => m.PublicationDate >= fromDate && m.PublicationDate <= toDate.AddDays(1).AddTicks(-1))
                 .GroupBy(m => m.AuthorId)
-                .Select(g => new AuthorTotalViewResult()
+                .Select(g => new AuthorTotals()
                 {
                     AuthorId = g.Key,
                     TotalViewCount = g.Select(k => k).Sum(l => l.ViewCount),

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace MessagesAPI.Models
+namespace Brokers.DAL.Model
 {
-    public class AuthorTotalViewResult
+    public class AuthorTotals
     {
         public int AuthorId { get; set; }
         public int TotalViewCount { get; set; }
@@ -20,7 +20,7 @@ namespace MessagesAPI.Models
                 return false;
             }
 
-            var obj2 = obj as AuthorTotalViewResult;
+            var obj2 = obj as AuthorTotals;
 
             if (AuthorId == obj2.AuthorId &&
                 TotalViewCount == obj2.TotalViewCount &&
