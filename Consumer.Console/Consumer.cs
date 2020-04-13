@@ -1,8 +1,9 @@
 ﻿using Brokers.DAL.Configurations;
 using Brokers.DAL.Consumers;
 using Brokers.DAL.Interfaces;
-using Brokers.DAL.Loggers;
 using Brokers.DAL.Model;
+using log4net;
+using log4net.Config;
 using Nest;
 using System;
 using System.Collections;
@@ -15,13 +16,15 @@ namespace Consumer.Console
     public class Consumer
     {
         static IMessageConsumer consumer;
-        static ILogger logger = new Log4Net("loggerLog4net");
+        static ILog logger = LogManager.GetLogger("loggerLog4net");
         static object locker = new object();
         static readonly string nameIndex = "messages";
         static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
 
         static void Main(string[] args)
         {
+            XmlConfigurator.Configure();
+
             try
             {
                 if (args.Select(s => s.ToLower()).Contains("kafka"))
@@ -65,7 +68,15 @@ namespace Consumer.Console
 
         private static void ResendMessageToES(Message message)
         {
-            _ = esClient.Index(message, i => i.Id(message.PublicatonId));
+            try
+            {
+                var result = esClient.Index(message, i => i.Id(message.PublicatonId));
+                //Проверка на результат
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
         }
     }
 }

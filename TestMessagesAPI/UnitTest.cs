@@ -56,8 +56,8 @@ namespace TestMessagesAPI
             Thread.Sleep(1000);
 
             var response = controller.GetTopAuthorsByViews(fromDate, toDate, 3);
-            var content = response.Content as ObjectContent<IEnumerable<AuthorTotals>>;
-            var result = (content.Value as IEnumerable<AuthorTotals>)?.FirstOrDefault();
+            var content = response.Content as ObjectContent<IEnumerable<TopAuthorsByViews>>;
+            var result = (content.Value as IEnumerable<TopAuthorsByViews>)?.FirstOrDefault();
 
 
 
@@ -97,13 +97,13 @@ namespace TestMessagesAPI
             Thread.Sleep(1000);
 
             var response = controller.GetTopAuthorsByViews(fromDate, toDate, limit);
-            var content = response.Content as ObjectContent<IEnumerable<AuthorTotals>>;
-            var result = (content.Value as IEnumerable<AuthorTotals>).ToArray();
+            var content = response.Content as ObjectContent<IEnumerable<TopAuthorsByViews>>;
+            var result = (content.Value as IEnumerable<TopAuthorsByViews>).ToArray();
 
             var sample = messages
                 .Where(m => m.PublicationDate >= fromDate && m.PublicationDate <= toDate.AddDays(1).AddTicks(-1))
                 .GroupBy(m => m.AuthorId)
-                .Select(g => new AuthorTotals()
+                .Select(g => new TopAuthorsByViews()
                 {
                     AuthorId = g.Key,
                     TotalViewCount = g.Select(k => k).Sum(l => l.ViewCount),

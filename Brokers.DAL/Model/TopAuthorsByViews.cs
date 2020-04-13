@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Brokers.DAL.Model
 {
-    public class AuthorTotals
+    public class TopAuthorsByViews
     {
         public int AuthorId { get; set; }
         public int TotalViewCount { get; set; }
@@ -20,7 +20,7 @@ namespace Brokers.DAL.Model
                 return false;
             }
 
-            var obj2 = obj as AuthorTotals;
+            var obj2 = obj as TopAuthorsByViews;
 
             if (AuthorId == obj2.AuthorId &&
                 TotalViewCount == obj2.TotalViewCount &&

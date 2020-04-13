@@ -14,7 +14,6 @@ namespace Producer.Console
     {
         static IProducer producer;
         static readonly IGenerator<Message> generator = new RandomPublicationGenerator();
-
         static void Main(string[] args)
         {
             try

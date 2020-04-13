@@ -9,6 +9,6 @@ namespace Brokers.DAL.Interfaces
 {
     public interface IMessagesReportBuilder
     {
-        IEnumerable<AuthorTotals> GetTopAuthorsByViews(DateTime fromDate, DateTime toDate, int limit);//TODO AuthorTotals?
+        IEnumerable<TopAuthorsByViews> GetTopAuthorsByViews(DateTime fromDate, DateTime toDate, int limit);//TODO AuthorTotals?
     }
 }

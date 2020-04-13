@@ -1,26 +1,28 @@
 ﻿using Brokers.DAL.Configurations;
 using Brokers.DAL.Consumers;
 using Brokers.DAL.Interfaces;
-using Brokers.DAL.Loggers;
 using Brokers.DAL.Model;
 using System;
 using System.Configuration;
 using System.ServiceProcess;
 using Newtonsoft.Json;
 using Nest;
+using log4net.Config;
+using log4net;
 
 namespace Consumer.Service
 {
     public partial class ConsumerService : ServiceBase
     {
         private readonly IMessageConsumer consumer;
-        private readonly ILogger logger = new Log4Net("loggerLog4net");
+        static ILog logger = LogManager.GetLogger("loggerLog4net");
         static readonly string nameIndex = "messages";
         static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
 
         public ConsumerService()
         {
             InitializeComponent();
+            XmlConfigurator.Configure();
 
             try
             {
@@ -29,7 +31,7 @@ namespace Consumer.Service
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message);
+                logger.Error(ex.Message, ex);
                 consumer?.Close();
                 throw;
             }

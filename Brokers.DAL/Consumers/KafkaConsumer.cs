@@ -1,6 +1,7 @@
 ﻿using Brokers.DAL.Interfaces;
 using Brokers.DAL.Model;
 using Confluent.Kafka;
+using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Threading;
@@ -14,13 +15,12 @@ namespace Brokers.DAL.Consumers
         CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
         CancellationToken token;
         ConsumerConfig config;
-        private readonly ILogger logger;
+        private readonly ILog logger;
 
-        public KafkaConsumer(ILogger logger)
+        public KafkaConsumer(ILog logger)
         {
             Initialize();
             this.logger = logger;
-            this.logger.InitLogger();
         }
 
         public void Close()
@@ -69,7 +69,7 @@ namespace Brokers.DAL.Consumers
                         }
                         catch (Exception ex)
                         {
-                            logger.Error(ex.Message);
+                            logger.Error(ex.Message, ex);
                         }
                     }
                     consumer.Close();
