@@ -12,15 +12,25 @@ namespace Brokers.DAL.Consumers
     public class KafkaConsumer : IMessageConsumer
     {
         public event Action<Message> NewMessage;
+
         CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
         CancellationToken token;
         ConsumerConfig config;
-        private readonly ILog logger;
+        readonly ILog logger;
 
         public KafkaConsumer(ILog logger)
         {
-            Initialize();
             this.logger = logger;
+
+            try
+            {
+                Initialize();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
         }
 
         public void Close()
@@ -31,24 +41,17 @@ namespace Brokers.DAL.Consumers
         public void StartConsume()
         {
             token = cancelTokenSource.Token;
-            Receive(token);
+            _ = Receive(token);
         }
 
         private void Initialize()
         {
-            try
+            config = new ConsumerConfig()
             {
-                config = new ConsumerConfig()
-                {
-                    BootstrapServers = "localhost",
-                    GroupId = "abc",
-                    AutoOffsetReset = AutoOffsetReset.Earliest,
-                };
-            }
-            catch
-            {
-                throw new Exception("Unable connect to RabbitMQ");
-            }
+                BootstrapServers = "localhost",
+                GroupId = "abc",
+                AutoOffsetReset = AutoOffsetReset.Earliest,
+            };
         }
         private async Task Receive(CancellationToken cancellationToken)
         {
@@ -69,7 +72,7 @@ namespace Brokers.DAL.Consumers
                         }
                         catch (Exception ex)
                         {
-                            logger.Error(ex.Message, ex);
+                            logger.Warn("Message processing error", ex);
                         }
                     }
                     consumer.Close();

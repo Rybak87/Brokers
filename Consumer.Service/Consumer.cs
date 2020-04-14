@@ -9,15 +9,19 @@ using Newtonsoft.Json;
 using Nest;
 using log4net.Config;
 using log4net;
+using System.Timers;
 
 namespace Consumer.Service
 {
     public partial class ConsumerService : ServiceBase
     {
-        private readonly IMessageConsumer consumer;
+        static IMessageConsumer consumer;
         static ILog logger = LogManager.GetLogger("loggerLog4net");
         static readonly string nameIndex = "messages";
-        static ElasticClient esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
+        static ElasticClient esClient;
+        static long counterLogMessagesValid = 0;
+        static long counterLogMessagesInvalid = 0;
+        static Timer timerLogMessage = new Timer(60000);
 
         public ConsumerService()
         {
@@ -26,37 +30,75 @@ namespace Consumer.Service
 
             try
             {
-                var settings = (RabbitMQSettings) ConfigurationManager.GetSection("rabbitMQSettings");
-                consumer = new RabbitMQConsumer(settings, logger);
+                esClient = new ElasticClient(new ConnectionSettings(new Uri("http://localhost:9200")).DefaultIndex(nameIndex));
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                consumer?.Close();
-                throw;
+                logger.Error("Unable create ElasticClient", ex);
+            }
+
+            timerLogMessage.Elapsed += (s, e) =>
+            {
+                logger.Info(string.Format("Count of indexing messages: {0}", counterLogMessagesValid));
+                logger.Info(string.Format("Count of indexing errors: {0}", counterLogMessagesInvalid));
+                counterLogMessagesValid = 0;
+                counterLogMessagesInvalid = 0;
+            };
+
+            try
+            {
+                RabbitMQSettings settings = (RabbitMQSettings)ConfigurationManager.GetSection("rabbitMQSettings");
+                consumer = new RabbitMQConsumer(settings, logger);
+                logger.Info("Consumer created");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Unable create consumer", ex);
             }
         }
 
         protected override void OnStart(string[] args)
         {
-            consumer.NewMessage += HandlingMessage;
             consumer.NewMessage += ResendMessageToES;
-            consumer.StartConsume();
+            timerLogMessage.Start();
+
+            try
+            {
+                consumer.StartConsume();
+                logger.Info("Started consume");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Unable start consume", ex);
+            }
         }
 
         protected override void OnStop()
         {
             consumer.Close();
+            timerLogMessage.Stop();
         }
 
-        private void HandlingMessage(Message message)
+        static void ResendMessageToES(Message message)
         {
-            logger.Debug(JsonConvert.SerializeObject(message));
-        }
+            try
+            {
+                var result = esClient.Index(message, i => i.Id(message.PublicatonId));
+                logger.Debug(string.Format("Indexing message id = {0}", message.PublicatonId), result.OriginalException);
 
-        private static void ResendMessageToES(Message message)
-        {
-            _ = esClient.Index(message, i => i.Id(message.PublicatonId));
+                if (result.IsValid)
+                {
+                    counterLogMessagesValid++;
+                }
+                else
+                {
+                    counterLogMessagesInvalid++;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Warn("Unable to send a message", ex);
+            }
         }
     }
 }

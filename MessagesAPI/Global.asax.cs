@@ -1,3 +1,4 @@
+using log4net.Config;
 using MessagesAPI.Util;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace MessagesAPI
         {
             AutofacConfig.ConfigureContainer();
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            XmlConfigurator.Configure();
         }
     }
 }

@@ -14,13 +14,13 @@ namespace Brokers.DAL.Consumers
 
     public class RabbitMQConsumer : IMessageConsumer
     {
+        public event Action<Message> NewMessage;
+
         private IConnection connection;
         private IModel channel;
         private EventingBasicConsumer consumer;
         private readonly ILog logger;
         private string queueName;
-
-        public event Action<Message> NewMessage;
 
         public RabbitMQConsumer(RabbitMQSettings config, ILog logger)
         {
@@ -28,22 +28,22 @@ namespace Brokers.DAL.Consumers
 
             try
             {
-                InitConnection(config);
+                Initialize(config);
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
-                throw new Exception("Unable connect to RabbitMQ");
+                throw ex;
             }
         }
 
-        private void InitConnection(RabbitMQSettings config)
+        private void Initialize(RabbitMQSettings config)
         {
             queueName = config.QueueName;
 
             connection = config.CreateConnection();
-            connection.ConnectionShutdown += (o, e) => { logger.Error("Сервер не отвечает"); };
-            connection.CallbackException += (o, e) => { logger.Error(e.Exception.Message, e.Exception); };
+            connection.ConnectionShutdown += (o, e) => { logger.Warn("Server is not responding"); };
+            connection.CallbackException += (o, e) => { logger.Error("RabbitMQ connection throw exception", e.Exception); };
 
             channel = connection.CreateModel();
             channel.ExchangeDeclare("main", "fanout", durable: true);
@@ -75,7 +75,7 @@ namespace Brokers.DAL.Consumers
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
+                logger.Warn("Message processing error", ex);
             }
         }
     }
