@@ -83,11 +83,9 @@
     <Compile Include="Generator\SimpleGenerator.cs" />
     <Compile Include="Interfaces\IConsumer.cs" />
     <Compile Include="Interfaces\IGenerator.cs" />
-    <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\IMessagesReportBuilder.cs" />
     <Compile Include="Interfaces\IProducer.cs" />
-    <Compile Include="Loggers\Log4Net.cs" />
-    <Compile Include="Model\AuthorTotals.cs" />
+    <Compile Include="Model\TopAuthorsByViews.cs" />
     <Compile Include="Model\Message.cs" />
     <Compile Include="Producers\KafkaProducer.cs" />
     <Compile Include="Producers\RabbitMQProducer.cs" />

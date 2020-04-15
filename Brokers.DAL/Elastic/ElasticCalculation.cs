@@ -23,7 +23,7 @@ namespace Brokers.DAL.Elastic
             this.esClient = esClient;
         }
 
-        public IEnumerable<AuthorTotals> GetTopAuthorsByViews(DateTime fromDate, DateTime toDate, int limit)
+        public IEnumerable<TopAuthorsByViews> GetTopAuthorsByViews(DateTime fromDate, DateTime toDate, int limit)
         {
             toDate = toDate.AddDays(1).AddTicks(-1);
             var searchResponse = esClient.Search<Message>(s => s
@@ -54,12 +54,12 @@ namespace Brokers.DAL.Elastic
             );
 
             if (searchResponse.Aggregations.Count == 0)
-                return Enumerable.Empty<AuthorTotals>();
+                return Enumerable.Empty<TopAuthorsByViews>();
 
             var bucketAggregate = searchResponse.Aggregations.Values.First() as BucketAggregate;
             var keyedBuckets = bucketAggregate.Items.Select(i => i as KeyedBucket<object>);
 
-            var result = keyedBuckets.Select(b => new AuthorTotals
+            var result = keyedBuckets.Select(b => new TopAuthorsByViews
             {
                 AuthorId = Convert.ToInt32(b.Key),
                 TotalViewCount = Convert.ToInt32((b.Aggregations["TotalViewCount"] as ValueAggregate).Value),

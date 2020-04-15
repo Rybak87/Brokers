@@ -1,6 +1,8 @@
 ﻿using Brokers.DAL.Configurations;
 using Brokers.DAL.Interfaces;
 using Brokers.DAL.Model;
+using log4net;
+using log4net.Config;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -12,37 +14,36 @@ namespace Brokers.DAL.Consumers
 
     public class RabbitMQConsumer : IMessageConsumer
     {
+        public event Action<Message> NewMessage;
+
         private IConnection connection;
         private IModel channel;
         private EventingBasicConsumer consumer;
-        private readonly ILogger logger;
+        private readonly ILog logger;
         private string queueName;
 
-        public event Action<Message> NewMessage;
-
-        public RabbitMQConsumer(RabbitMQSettings config, ILogger logger)
+        public RabbitMQConsumer(RabbitMQSettings config, ILog logger)
         {
             this.logger = logger;
-            this.logger.InitLogger();
 
             try
             {
-                InitConnection(config);
+                Initialize(config);
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message);
-                throw new Exception("Unable connect to RabbitMQ");
+                logger.Error(ex.Message, ex);
+                throw ex;
             }
         }
 
-        private void InitConnection(RabbitMQSettings config)
+        private void Initialize(RabbitMQSettings config)
         {
             queueName = config.QueueName;
 
             connection = config.CreateConnection();
-            connection.ConnectionShutdown += (o, e) => { logger.Error("Сервер не отвечает"); };
-            connection.CallbackException += (o, e) => { logger.Error(e.Exception.Message); };
+            connection.ConnectionShutdown += (o, e) => { logger.Warn("Server is not responding"); };
+            connection.CallbackException += (o, e) => { logger.Error("RabbitMQ connection throw exception", e.Exception); };
 
             channel = connection.CreateModel();
             channel.ExchangeDeclare("main", "fanout", durable: true);
@@ -70,11 +71,11 @@ namespace Brokers.DAL.Consumers
             {
                 var consumeResult = Encoding.UTF8.GetString(e.Body);
                 var message = JsonConvert.DeserializeObject<Message>(consumeResult);
-                NewMessage?.Invoke(message); // Message handling code can throw exceptions we need to ensure the service does not leave unhandled exception.
+                NewMessage?.Invoke(message);
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message);
+                logger.Warn("Message processing error", ex);
             }
         }
     }
