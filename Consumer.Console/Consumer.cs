@@ -22,7 +22,7 @@ namespace Consumer.Console
         static ElasticClient esClient;
         static long counterLogMessagesValid = 0;
         static long counterLogMessagesInvalid = 0;
-        static Timer timerLogMessage = new Timer(60000);
+        static Timer timerLogMessage = new Timer(10000);
 
         static void Main(string[] args)
         {
@@ -40,6 +40,10 @@ namespace Consumer.Console
 
             timerLogMessage.Elapsed += (s, e) =>
             {
+                if (counterLogMessagesValid==0 && counterLogMessagesInvalid==0)
+                {   
+                    return;
+                }
                 logger.Info(string.Format("Count of indexing messages: {0}", counterLogMessagesValid));
                 logger.Info(string.Format("Count of indexing errors: {0}", counterLogMessagesInvalid));
                 counterLogMessagesValid = 0;
